@@ -1,0 +1,83 @@
+-- Ejercicio 1: Seleccione todos los datos de la tabla Departament del schema HumanResources
+SELECT * FROM HumanResources.Department
+
+-- Ejercicio 2: Seleccione un agrupamiento de los nombres de grupos que existen en la tabla 
+-- Departament del schema HumanResources
+SELECT GroupName FROM HumanResources.Department GROUP BY GroupName
+
+-- Ejercicio 3: Seleccione todos los departamentos ordenándolos en orden descendente
+SELECT * FROM HumanResources.Department ORDER BY Department.Name DESC
+
+-- Ejercicio 4: Seleccione todos los departamentos ordenándolos en orden ascendente
+SELECT * FROM HumanResources.Department ORDER BY Department.Name ASC
+
+-- Ejercicio 5: Seleccione todos los empleados de la tabla Employee del schema Human Resources
+SELECT * FROM HumanResources.Employee
+
+-- Ejercicio 6: Seleccione todos los empleados de la tabla Employee del schema Human Resources donde
+-- el género sea masculino
+SELECT * FROM HumanResources.Employee WHERE Gender = 'M'
+
+-- Ejercicio 7: Seleccione todos los empleados de la tabla Employee del schema Human Resources donde
+-- el nivel de organización sea mayor a 3
+SELECT * FROM HumanResources.Employee Where OrganizationLevel > 3
+
+-- Ejercicio 8: Seleccione todos los empleados de la tabla Employee del schema Human Resources donde
+-- el nivel de organización sea mayor e igual a 2 y que el género sea femenino
+SELECT * FROM HumanResources.Employee WHERE OrganizationLevel >= 2 AND Gender = 'F'
+
+-- Ejercicio 9: Seleccione los campos BusinessEntityID,NationalIDNumber de la tabla Employee del
+-- schema Human Resources donde los jobtitle sean Marketing Assistant o Design Engineer
+SELECT  BusinessEntityID, NationalIDNumber
+FROM HumanResources.Employee WHERE JobTitle = 'Marketing Assistant' OR JobTitle = 'Design Engineer'
+
+-- Ejercicio 10: . Seleccionar todos los empleados de la tabla Employee del schema Human Resources que
+-- estén entre la fecha de nacimiento de 1 de enero de 1969 y 31 de diciembre de 1972
+SELECT * FROM HumanResources.Employee WHERE BirthDate BETWEEN '1969/01/01' AND '1972/12/31'
+
+-- Ejercicio 11: De la tabla Employee del schema Human Resources Calcule el total de ah pagar por horas
+-- de vacacion si se conece que cada hora cuesta $8.00
+SELECT VacationHours, VacationHours * 8.00 AS 'TotalVacationCost'
+FROM HumanResources.Employee
+
+-- Ejercicio 12: De la tabla Production.ProductSubcategory muestre cuantas subcategorías hay registradas
+-- por categoría
+SELECT ProductCategory.Name AS 'CategoryName',
+COUNT(ProductSubcategory.ProductSubcategoryID) AS 'SubcategoryCount'
+FROM Production.ProductCategory 
+LEFT JOIN Production.ProductSubcategory ON ProductCategory.ProductCategoryID = ProductSubcategory.ProductCategoryID
+GROUP BY ProductCategory.Name
+
+-- Ejercicio 13: . De la tabla Sales.Customer mostrar cuantos clientes existen registrados por territorios
+SELECT TerritoryID, 
+COUNT(CustomerID) AS 'CustomerCount'
+FROM Sales.Customer
+GROUP BY TerritoryID
+
+-- Ejercicio 14: De la tabla sales.SalesOrderHeader mostrar la suma total del Sub Total de compra según el
+-- IdCustomer que se coloque
+SELECT CustomerID, SUM(SubTotal) AS 'TotalPurchaseAmount'
+FROM Sales.SalesOrderHeader
+WHERE CustomerID IN (SELECT DISTINCT CustomerID FROM Sales.SalesOrderHeader)
+GROUP BY CustomerID;
+
+-- Ejercicio 15: De la tabla Sales.CreditCard mostrar cuantas tarjetas según su tipo están registradas en el
+-- sistema
+SELECT COUNT(CardType) AS 'CardCount'
+FROM Sales.CreditCard
+GROUP BY CardType
+ORDER BY CardType
+
+-- Ejercicio 16: . De la tabla Sales.SalesOrderDetail evaluar Linea total de compra que es el total de la
+-- compra , si la compra es mayor de $1000.00 realizar un descuento del 10% y mostrar el
+-- nuevo total a pagar si es mayor $1500.00 realizar un descuento del 14% y mostrar el
+-- nuevo total a pagar si es mayor de $2000.00 realizar un descuento del 18% y mostrar el
+-- nuevo total a pagar
+SELECT SalesOrderID, ProductID, OrderQty, UnitPrice, LineTotal AS 'OriginalTotal',
+CASE
+	WHEN LineTotal > 2000.00 THEN LineTotal * 0.82  -- Descuento del 18% si es mayor de $2000.00
+	WHEN LineTotal > 1500.00 THEN LineTotal * 0.86  -- Descuento del 14% si es mayor de $1500.00
+	WHEN LineTotal > 1000.00 THEN LineTotal * 0.90  -- Descuento del 10% si es mayor de $1000.00
+	ELSE LineTotal  -- Sin descuento si no cumple con ninguno de los umbrales
+END AS 'TotalConDescuento'
+FROM Sales.SalesOrderDetail
